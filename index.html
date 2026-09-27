@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payment Fee & Net Invoice Calculator | Stripe, PayPal, Wise, Square</title>
+<meta name="description" content="Free calculator for freelancers: see exactly how much Stripe, PayPal, Wise, or Square fees will take from a payment — including international / cross-border surcharges — or reverse-calculate the invoice total you need to send to keep your target amount.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <p class="site-title">Fee&nbsp;Check</p>
+
+  <!-- AdSense Slot 1 of 3: ABOVE CALCULATOR -->
+  <div class="ad-slot" aria-label="Advertisement">
+    <span>Advertisement</span>
+    <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1111111111" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+    Ad unit placeholder — above calculator (responsive)
+  </div>
+
+  <h1>Payment Fee &amp; Net Invoice Calculator</h1>
+  <p class="lede">Find out exactly how much a payment processor keeps — including international cross-border surcharges — and what to invoice a client so a specific amount lands in your account after fees.</p>
+
+  <div class="card">
+
+    <div class="mode-toggle" role="tablist" aria-label="Calculation mode">
+      <button type="button" id="modeForwardBtn" class="active" role="tab" aria-selected="true">Calculate fees on total</button>
+      <button type="button" id="modeReverseBtn" role="tab" aria-selected="false">Reverse: I want to keep <span id="reverseSymbol">$</span>X</button>
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label for="amount" id="amountLabel">Transaction amount</label>
+        <div class="amount-input">
+          <span class="prefix" id="currencyPrefix">$</span>
+          <input type="number" id="amount" inputmode="decimal" min="0" step="0.01" placeholder="1000.00" value="1000">
+        </div>
+      </div>
+      <div class="field">
+        <label for="country">Client's country / region</label>
+        <select id="country">
+          <option value="us" selected>United States ($)</option>
+          <option value="uk">United Kingdom (£)</option>
+          <option value="ca">Canada (C$)</option>
+          <option value="au">Australia (A$)</option>
+          <option value="eu">European Union (€)</option>
+          <option value="other">Other / International</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field other-symbol-row" id="otherSymbolRow">
+      <label for="otherSymbol">Currency symbol</label>
+      <div class="amount-input">
+        <input type="text" id="otherSymbol" maxlength="4" placeholder="e.g. ₹, R$, ¥" value="$">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="platform">Payment platform</label>
+      <select id="platform">
+        <option value="stripe" selected>Stripe</option>
+        <option value="paypal">PayPal</option>
+        <option value="square">Square</option>
+        <option value="wise">Wise</option>
+        <option value="custom">Custom rate…</option>
+      </select>
+    </div>
+    <p class="hint" id="crossBorderHint"></p>
+
+    <div class="checkbox-row" id="crossBorderRow">
+      <label>
+        <input type="checkbox" id="crossBorderCheck">
+        This is a cross-border / international payment (+1.5% surcharge)
+      </label>
+    </div>
+
+    <div class="custom-rate-row" id="customRow">
+      <div class="field">
+        <label for="customPct">Custom % fee</label>
+        <div class="amount-input">
+          <input type="number" id="customPct" inputmode="decimal" min="0" step="0.01" value="2.9">
+          <span class="prefix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label for="customFixed">Custom fixed fee</label>
+        <div class="amount-input">
+          <span class="prefix" id="customFixedPrefix">$</span>
+          <input type="number" id="customFixed" inputmode="decimal" min="0" step="0.01" value="0.30">
+        </div>
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div class="result-row fee">
+        <span class="rlabel" id="rBaseFeeLabel">Processing fee</span>
+        <span class="rval" id="rBaseFee">$0.00</span>
+      </div>
+      <div class="result-row crossborder" id="rCrossRow">
+        <span class="rlabel" id="rCrossLabel">Cross-border surcharge</span>
+        <span class="rval" id="rCross">$0.00</span>
+      </div>
+      <div class="result-row">
+        <span class="rlabel" id="rNetLabel">Net amount you receive</span>
+        <span class="rval" id="rNet">$0.00</span>
+      </div>
+      <div class="result-row total">
+        <span class="rlabel" id="rTotalLabel">Total to invoice client</span>
+        <span class="rval" id="rTotal">$0.00</span>
+      </div>
+    </div>
+
+    <button class="copy-btn" id="copyBtn" type="button">Copy invoice note</button>
+  </div>
+
+  <!-- AdSense Slot 2 of 3: BELOW CALCULATOR -->
+  <div class="ad-slot" aria-label="Advertisement">
+    <span>Advertisement</span>
+    <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="2222222222" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+    Ad unit placeholder — below calculator (responsive)
+  </div>
+
+  <div class="seo">
+    <h2>How to use this calculator</h2>
+    <p>This tool works two ways, depending on which problem you're solving:</p>
+    <ol class="steps">
+      <li><strong>Calculate fees on total</strong> — enter the amount a client is paying you, choose the platform and their country, and see the fee taken out and what actually lands in your account.</li>
+      <li><strong>Reverse calculate</strong> — enter the amount you need to keep after fees, and the tool works out the total you should put on the invoice so the fee doesn't cost you anything.</li>
+      <li>Select your country to load that region's default rate for each platform, in the local currency. Choose "Other / International" for any country not listed — you can type your own currency symbol and the tool falls back to a generic global rate estimate (use "Custom rate" below instead if you know the exact figures).</li>
+      <li>If the client's card or account is issued in a different country than your own, tick "cross-border / international payment" to add the +1.5% surcharge Stripe and PayPal typically apply (Square and Wise don't carry a separate surcharge in this tool).</li>
+      <li>Choose "Custom rate" to enter a processor's exact percentage and fixed fee instead — useful if you already know your negotiated or local rate.</li>
+      <li>Results update instantly as you type — no button to press.</li>
+      <li>Use "Copy invoice note" to grab a plain-text summary you can paste straight into an invoice or client email.</li>
+    </ol>
+
+    <h2>Default online invoicing rates by country</h2>
+    <div class="table-scroll">
+      <table class="rate-table">
+        <thead><tr><th>Platform</th><th>US</th><th>UK</th><th>Canada</th><th>Australia</th><th>EU</th></tr></thead>
+        <tbody>
+          <tr><td>Stripe</td><td>2.9% + $0.30</td><td>1.5% + £0.20</td><td>2.9% + C$0.30</td><td>1.75% + A$0.30</td><td>1.5% + €0.25</td></tr>
+          <tr><td>PayPal</td><td>3.49% + $0.49</td><td>2.9% + £0.30</td><td>3.7% + C$0.59</td><td>2.9% + A$0.30</td><td>2.9% + €0.35</td></tr>
+          <tr><td>Square</td><td>3.3% + $0.30</td><td>1.4% + £0.25</td><td>2.8% + C$0.30</td><td>2.2% + A$0.00</td><td>1.4% + €0.25</td></tr>
+          <tr><td>Wise</td><td>0.45%</td><td>0.35%</td><td>0.45%</td><td>0.45%</td><td>0.41%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="hint" style="margin-top:6px;">Swipe sideways to see all columns on a small screen.</p>
+    <p>Wise's rate is mid-market and variable by currency pair, so treat its figure as an estimate. A cross-border surcharge of around 1.5% is common on Stripe and PayPal when the payer's card is issued outside your account's country — tick the checkbox above to include it. Rates change periodically — always confirm current pricing on the provider's own page before finalizing an invoice.</p>
+
+    <h2>Why should freelancers pass payment processing fees to clients?</h2>
+    <p>A processing fee is a cost of doing business tied directly to how you get paid, not to the work itself. When you absorb it, you're effectively giving every client a small, invisible discount that scales with invoice size and that they never asked for. Passing the fee through, or building it into your rate, keeps your take-home pay predictable regardless of which payment method or country a client is in. Many independent contractors state this plainly in their payment terms so there's no ambiguity: card and PayPal payments carry a processing surcharge, wire or ACH transfers typically don't.</p>
+
+    <h2>How do Stripe and PayPal calculate international processing fees?</h2>
+    <p>Domestic card rates are usually a percentage of the charge plus a small fixed fee, but both platforms add extra charges for cross-border transactions. Stripe and PayPal typically layer on an additional international or cross-border fee — often in the 1–2% range — on top of the base rate when the client's card or account is issued in a different country, and currency conversion adds a further spread if the payment isn't already in your local currency. This is why an invoice to an overseas client can cost noticeably more in fees than the same amount from a domestic one, and it's worth checking the current international rate on the processor's pricing page before quoting a client.</p>
+
+    <h2>Tips for setting fair invoice terms for remote clients</h2>
+    <p>Decide upfront whether your quoted rate already includes processing fees or whether they'll be added separately, and put that in writing before the project starts. Offering a lower-fee payment method, like a bank transfer or Wise, alongside card payments gives cost-conscious clients an option without you absorbing the difference. For recurring clients, consider naming the exact fee percentage in your contract so there's no back-and-forth on each invoice. Finally, round invoice totals to sensible amounts where possible; a total ending in an odd number of cents can look like a mistake even when it's the correct fee-adjusted figure.</p>
+  </div>
+
+  <!-- AdSense Slot 3 of 3: BOTTOM CONTENT SECTION -->
+  <div class="ad-slot" aria-label="Advertisement">
+    <span>Advertisement</span>
+    <!-- <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="3333333333" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+    Ad unit placeholder — bottom content section (responsive)
+  </div>
+
+  <footer>
+    <nav class="footer-links" aria-label="Legal">
+      <button type="button" class="link-btn" data-modal="privacyModal">Privacy Policy</button>
+      <span class="footer-dot">·</span>
+      <button type="button" class="link-btn" data-modal="termsModal">Terms of Service</button>
+      <span class="footer-dot">·</span>
+      <button type="button" class="link-btn" data-modal="aboutModal">About &amp; Contact</button>
+    </nav>
+    <p>Fee Check — estimates only. Always verify current rates with your payment provider. &copy; <span id="year"></span></p>
+  </footer>
+
+</div>
+
+<!-- Privacy Policy modal -->
+<div class="modal-overlay" id="privacyModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="privacyTitle">
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+    <h2 id="privacyTitle">Privacy Policy</h2>
+    <p>This calculator runs entirely in your browser. Amounts, platform choices, and country selections you enter are used only to display results on this page and are not sent to, stored on, or logged by any server.</p>
+    <p><strong>Advertising and cookies.</strong> This site may show ads served by Google AdSense. Google, as a third-party vendor, uses cookies (including the DoubleClick DART cookie) to serve ads based on your prior visits to this and other websites. Google's use of advertising cookies enables it and its partners to serve ads based on your visits to this site and/or other sites on the internet.</p>
+    <p>You may opt out of personalized advertising by visiting Google's <a href="https://adssettings.google.com" target="_blank" rel="noopener">Ads Settings</a>, or opt out of a third-party vendor's use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info" target="_blank" rel="noopener">www.aboutads.info</a>.</p>
+    <p><strong>What we don't collect.</strong> We don't require sign-up, don't collect names, emails, or payment details through this tool, and don't use the figures you enter for anything beyond the on-screen calculation.</p>
+    <p><strong>Changes.</strong> This policy may be updated from time to time; the version on this page is always the current one.</p>
+  </div>
+</div>
+
+<!-- Terms of Service modal -->
+<div class="modal-overlay" id="termsModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="termsTitle">
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+    <h2 id="termsTitle">Terms of Service</h2>
+    <p>By using this calculator, you agree to the following:</p>
+    <p><strong>Estimates only.</strong> All figures produced by this tool are estimates for informational purposes and are based on publicly available, general default rates. Actual fees charged by Stripe, PayPal, Square, Wise, or any other processor may differ based on your account type, transaction volume, currency, card type, and country-specific terms.</p>
+    <p><strong>No liability.</strong> We make no warranties about the accuracy or completeness of the calculations and accept no responsibility for financial decisions, invoices, or client agreements made using this tool. Always confirm current rates directly with your payment provider before finalizing an invoice.</p>
+    <p><strong>No professional advice.</strong> Nothing on this site constitutes financial, tax, accounting, or legal advice.</p>
+    <p><strong>Availability.</strong> This tool is provided "as is" without guarantee of uptime, and content or functionality may change at any time without notice.</p>
+  </div>
+</div>
+
+<!-- About & Contact modal -->
+<div class="modal-overlay" id="aboutModal" aria-hidden="true">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+    <button type="button" class="modal-close" aria-label="Close">&times;</button>
+    <h2 id="aboutTitle">About &amp; Contact</h2>
+    <p>Fee Check is a free, browser-based tool that helps freelancers and independent contractors see exactly how much a payment processor keeps from an invoice, and what to bill a client so a target amount lands in their account after fees.</p>
+    <p>Have a question, spotted an incorrect rate, or want a platform added? Get in touch: <a href="mailto:hello@fee-calc.com">kssum.5070@gmail.com</a></p>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
